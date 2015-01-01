@@ -4,7 +4,7 @@
   "description": "fripost get git repositories",
   "main": "index.js",
   "dependencies": {
-    "jsdom": "^2.0.0"
+    "hyperquest": "^1.0.1"
   },
   "devDependencies": {},
   "scripts": {

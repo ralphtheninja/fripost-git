@@ -1,33 +1,28 @@
 #!/usr/bin/env node
 var jsdom = require('jsdom')
-var url = 'http://git.fripost.org/'
-var selector = 'table > tbody > tr > td > a.list'
+var url = 'http://git.fripost.org/?a=project_index'
+var hyperquest = require('hyperquest')
 
 function getNames(cb) {
-  jsdom.env({
-    url: url,
-    done: function (err, window) {
-      if (err) return console.error(err)
-      var result = []
-      var list = window.document.querySelectorAll(selector)
-      var length = list.length
-      for (var i = 0; i < length; ++i) {
-        var innerHTML = list[i].innerHTML
-        if (innerHTML.length) result.push(innerHTML)
-      }
-      cb(null, result)
-    }
-
+  var names = []
+  var req = hyperquest(url)
+  req.on('data', function (data) {
+    names.push(data.toString().split(' ')[0])
   })
+  req.on('end', function (res) {
+    cb(null, names)
+  })
+  req.on('error', cb)
 }
 
 module.exports = getNames
 
 if (!module.parent) {
   getNames(function (err, repos) {
-    if (err) return process.stderr.write(err.toString())
+    if (err) return console.error(err)
     repos.forEach(function (repo) {
       console.log('https://git.fripost.org/pub/' + repo)
     })
   })
 }
+
